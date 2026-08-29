@@ -16,8 +16,8 @@ class PipelineStep(BaseModel):
     max_tokens: int = Field(default=200, le=300)
     max_retries: int = Field(default=3, le=5)
     agent_rol: Literal["buscador", "validador", "enriquecedor"]
-    input_schema: Type[BaseModel]
-    output_schema: Type[BaseModel]
+    input_schema: Type[BaseModel] = Field(exclude=True)
+    output_schema: Type[BaseModel] = Field(exclude=True)
 
 class PipelineCerrado(BaseModel):
     model_config = ConfigDict(frozen=True, arbitrary_types_allowed=True)
