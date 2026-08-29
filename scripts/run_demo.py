@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+
+# Añade src/ al path para que Python encuentre el paquete gobernado
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
 from dotenv import load_dotenv
 load_dotenv()
 
