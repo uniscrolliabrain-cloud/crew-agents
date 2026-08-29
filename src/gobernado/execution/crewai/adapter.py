@@ -1,10 +1,16 @@
-from crewai import Agent, Task, Crew
+import os
+from crewai import Agent, Task, Crew, LLM
 from pydantic import ValidationError, BaseModel
 from ...pipelines.base import PipelineStep, PipelineCerrado
 from ...ontologia.brief import Brief
 from ..interface import ExecutionResult, ErrorTipo
 from ...kernel.reintento import KernelReintento, IntentoState
 from ...kernel.validador import KernelValidador
+
+GEMINI_LLM = LLM(
+    model="gemini/gemini-2.5-flash",
+    api_key=os.getenv("GEMINI_API_KEY"),
+)
 
 class CrewAIBackend:
     def _clasificar_error(self, paso: PipelineStep, e: Exception) -> ExecutionResult:
@@ -26,7 +32,7 @@ class CrewAIBackend:
             return ExecutionResult(paso_fallido=paso, error_tipo=ErrorTipo.SCHEMA_INVALIDO, error_detalle=str(e))
 
         format_kwargs = {**input_data.model_dump(mode="json"), "input_json": input_data.model_dump_json()}
-        agente = Agent(role=paso.agent_rol, goal=paso.prompt_template, backstory="", verbose=False)
+        agente = Agent(role=paso.agent_rol, goal=paso.prompt_template, backstory="", llm=GEMINI_LLM, verbose=False)
         tarea = Task(
             description=paso.prompt_template.format(**format_kwargs),
             expected_output=str(paso.output_schema.model_json_schema()),
